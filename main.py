@@ -14,30 +14,37 @@ class LoginScreen(QMainWindow):
         super(LoginScreen, self).__init__()
         loadUi("atmloginpage.ui", self)
         self.la_welcome.show()
+        #making id and password input only integer
         self.li_id.setValidator(QIntValidator(self))
         self.li_password.setValidator(QIntValidator(self))
+        #when ok button clicked connect a function
         self.okB.clicked.connect(self.login)
+        #when erase button clicked connect a function
         self.eraseB.clicked.connect(self.erase_button)
     
     def hash_password(self, password):
+        #making hash to password
         salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
         pwdhash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
         pwdhash = binascii.hexlify(pwdhash)
         return (salt + pwdhash).decode('ascii')
     
     def login(self):
+        #transfers the made inputs to the variable
         self.id_number=str(self.li_id.text())
         self.password=self.li_password.text()
+        #sending the inputs the other classes
         CustomerScreen.id = self.id_number
         WithdrawScreen.id = self.id_number
         DepositScreen.id = self.id_number
-        #○CustomerInfoScreen.id = self.id_number
+        #CustomerInfoScreen.id = self.id_number
         CustomerSettings.id = self.id_number
         InternalScreen.id = self.id_number
         ExternalScreen.id = self.id_number
         StatementScreen.id = self.id_number
+        #taking the time for database input 
         self.now = datetime.datetime.now()
-
+        #postgreSQL connection
         conn = psycopg2.connect("dbname=atm_proje user=postgres password=12345")
         cur = conn.cursor()
         # Retrieve the hashed password and id number from the database using the id number provided by the user during login
